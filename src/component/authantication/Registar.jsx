@@ -11,7 +11,7 @@ import { AuthContext } from '../../provider/AuthProvider';
 
 const Register = () => {
 
-    const {registar} = useContext(AuthContext)
+    const {registar, updateUser} = useContext(AuthContext)
     
     const axiosSecure = useAxiosSecure()
     const [username, setUsername] = useState('');
@@ -36,7 +36,9 @@ setLoading(false)
 }
 
         await registar(email, password);
-   
+      await axiosSecure.post('/jwt',{email})
+    
+   await updateUser(username)
             toast.success('User registered successfully')
 
 

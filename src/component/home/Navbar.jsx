@@ -1,18 +1,28 @@
 
 import { NavLink } from 'react-router-dom';
 import { FaUser } from 'react-icons/fa';
+import { useContext } from 'react';
+import { AuthContext } from '../../provider/AuthProvider';
+import useAxiosSecure from '../../hook/useAxiosSecure';
 
 const Navbar = () => {
-    const user = true; // Placeholder for authentication context
+   const {user,logOut} = useContext(AuthContext);
+   const axiosSecure = useAxiosSecure()
 
     const nav = (
         <div className="lg:flex text-lg font-poppins">
             <li><NavLink to='/'>Home</NavLink></li>
             <li><NavLink to='/login'>Login</NavLink></li>
             <li><NavLink to='/registar'>Registar</NavLink></li>
-            <li><NavLink to='/my_crafts'>My Art & Craft List</NavLink></li>
+        
         </div>
     );
+
+    const logout= async ()=>{
+      await  logOut()
+      await axiosSecure.get('/clearCookie')
+
+    }
 
     return (
         <div className="navbar w-[96%] md:w-[90%] mx-auto max-w-[1620px] z-10 relative">
@@ -34,9 +44,16 @@ const Navbar = () => {
                     </ul>
                 </div>
                 <div>
-                    {/* Placeholder for additional navbar content */}
+                   
                 </div>
-            </div>
+
+       {
+
+        user &&          <div onClick={logout} className="navbar-end">
+        <a className="btn btn-primary text-white">LogOut</a>
+      </div>
+              
+       }  </div>
         </div>
     );
 };

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword,  signOut, updateProfile } from "firebase/auth";
 import { auth } from "../firebase/firebase.config";
+import axios from "axios";
 
 
 export const AuthContext = createContext(null)
@@ -24,12 +25,12 @@ const AuthProvider = ({children}) => {
     const login = (email, password) =>{
         return signInWithEmailAndPassword(auth, email, password)
     }
-    const updateUser = (name, photo)=>{
+    const updateUser = (name)=>{
     
     
         return updateProfile(auth.currentUser,{
             displayName: name,
-            photoURL:photo
+         
         })
     }
     const logOut = ()=>{
@@ -41,7 +42,13 @@ useEffect(()=>{
 
 const unSubscribe  = onAuthStateChanged(auth, (currentUser)=>{
 
+if(currentUser){
+    const userInfo = {email: currentUser.email};
+        axios.post('http://localhost:5000/jwt',userInfo)
+        .then(result => console.log( "jwt", result))
 
+
+}
 setLoader(false)
 setUser(currentUser)
 

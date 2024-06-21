@@ -1,22 +1,50 @@
-// src/components/PostModal.jsx
-
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { imageUpload } from '../../utilits/photoUpload';
+import useAxiosSecure from '../../hook/useAxiosSecure';
+import { AuthContext } from '../../provider/AuthProvider';
+import toast from 'react-hot-toast';
+import AuthLoading from '../loader/AuthLoading';
 
-const PostModal = ({ isOpen, onClose }) => {
+const PostModal = ({ isOpen, onClose, refetch }) => {
     const [postContent, setPostContent] = useState('');
     const [photo, setPhoto] = useState(null);
- 
+    const { user } = useContext(AuthContext);
+    const [loading, setLoading] = useState(false);
+
+    const axiosSecure = useAxiosSecure();
 
     const handlePost = async () => {
-        // Handle post submission logic
-        console.log('Post content:', postContent);
-        console.log('Photo:', photo);
-        const data = await imageUpload(photo);
-        console.log("photo",data);
+        setLoading(true);
+       
+        try {
+            let image = null;
+            if (photo) {
+                const data = await imageUpload(photo);
+                image = data;
+            }
+         
+            const postData = {
+                postContent,
+                photo: image,
+                email: user?.email,
+                date: new Date(),
+                userName: user?.displayName
+            };
 
-        onClose();
+            const response = await axiosSecure.post('/createPost', postData);
+            if (response.data.insertedId) {
+                setPostContent(''); // Reset post content
+                setPhoto(null); // Reset photo
+                onClose();
+                toast.success('Successfully posted');
+                refetch();
+                setLoading(false);
+            }
+        } catch (err) {
+            toast.error(err.message);
+            setLoading(false);
+        }
     };
 
     if (!isOpen) return null;
@@ -32,6 +60,7 @@ const PostModal = ({ isOpen, onClose }) => {
                 </button>
                 <h2 className="text-2xl font-bold mb-4 text-center">Create Post</h2>
                 <textarea
+                
                     className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-600 mb-4"
                     placeholder="What's on your mind?"
                     value={postContent}
@@ -46,7 +75,7 @@ const PostModal = ({ isOpen, onClose }) => {
                     onClick={handlePost}
                     className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition duration-300"
                 >
-                    Post
+                    {loading ? <AuthLoading /> : 'Post'}
                 </button>
             </div>
         </div>

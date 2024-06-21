@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import useAxiosSecure from '../../hook/useAxiosSecure';
 import AuthLoading from '../loader/AuthLoading';
 import { AuthContext } from '../../provider/AuthProvider';
+import axios from 'axios';
 
 const Login = () => {
     const {login} = useContext(AuthContext)
@@ -38,6 +39,8 @@ const [loading, setLoading] = useState(false)
           
             setLoading(false)
             toast.success('Login Successful');
+            axiosSecure.post('/jwt',{email})
+            .then(result => console.log( "jwt", result))
 
             
         } catch (error) {
