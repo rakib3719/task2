@@ -34,8 +34,8 @@ const PostModal = ({ isOpen, onClose, refetch }) => {
 
             const response = await axiosSecure.post('/createPost', postData);
             if (response.data.insertedId) {
-                setPostContent(''); // Reset post content
-                setPhoto(null); // Reset photo
+                setPostContent(''); 
+                setPhoto(null); 
                 onClose();
                 toast.success('Successfully posted');
                 refetch();
